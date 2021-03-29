@@ -140,40 +140,66 @@ TEST_CASE("Test Line")
         Line testLine3(testPoint6, testPoint5);
         
         REQUIRE(testLine3.lineIsParallel(testLine2) == true);
+        REQUIRE(myLine.lineIsParallel(testLine3) == true);
         
         Point testPoint7(1, 1);
         Point testPoint8(3, 3);
         Line testLine4(testPoint7, testPoint8);
         
         REQUIRE(testLine4.lineIsParallel(testLine4) == false);
+        
+        Point testPoint9(1, 1);
+        Point testPoint10(1, 3);
+        Point testPoint11(2, 1);
+        Point testPoint12(2, 3);
+        Line testLine5(testPoint9, testPoint10);
+        Line testLine6(testPoint11, testPoint12);
+        
+        REQUIRE(testLine5.lineIsParallel(testLine6) == true);
+        
+        Point testPoint13(2, 1);
+        Point testPoint14(2, 3);
+        Line testLine7(testPoint13, testPoint14);
+        
+        REQUIRE(myLine.lineIsParallel(testLine7) == false);
+        
+        
     }
     
     SECTION("Intersect"){
-        /*
+        
         Point testPoint1(2.8, 1);
         Point testPoint2(2.8, 8);
         Line testLine1(testPoint1, testPoint2);
         
         REQUIRE(myLine.lineIntersects(testLine1) == true);
-        */
+        
         Point testPoint3(1, 1);
         Point testPoint4(3, 3);
         Line testLine2(testPoint3, testPoint4);
         
         REQUIRE(myLine.lineIntersects(testLine2) == false);
-        /*
+        
         Point testPoint5(1, 1);
         Point testPoint6(1, 8);
         Line testLine3(testPoint5, testPoint6);
         
         REQUIRE(myLine.lineIntersects(testLine3) == false);
-         */
+        
         
         Point testPoint7(0, 5);
         Point testPoint8(10, 5);
         Line testLine4(testPoint7, testPoint8);
         
         REQUIRE(myLine.lineIntersects(testLine4) == true);
+        
+        Point testPoint9(2, 3.4);
+        Point testPoint10(5, 3.4);
+        Line testLine5(testPoint9, testPoint10);
+        
+        REQUIRE(myLine.lineIntersects(testLine5) == false);
+        
+        
     }
 
     SECTION("toString"){

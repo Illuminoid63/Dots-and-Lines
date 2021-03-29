@@ -72,8 +72,10 @@ bool Line::pointOnLine(Point x){
 
 bool Line::lineIsParallel(Line x){
     bool retval = false;
-    
-    if(this->slope - x.slope <= __DBL_EPSILON__ && this->intercept - x.intercept > __DBL_EPSILON__){
+    if(isinf(this->slope) && isinf(x.slope)){
+        retval = true;
+    }
+    else if(abs(this->slope - x.slope) <= __DBL_EPSILON__ && abs(this->intercept - x.intercept) > __DBL_EPSILON__){
         retval = true;
     }
     return retval;
@@ -88,6 +90,44 @@ bool Line::lineIntersects(Line x){
     
     if(lineIsParallel(x)){
         retval = false;
+    }
+    else if(isinf(this->slope) || isinf(x.slope)){
+        if(isinf(this->slope)){
+            double greaterY;
+            double lesserY;
+            double resultY = (this->getStartPoint().getX() * x.slope) + x.intercept;
+            if(startPoint.getY() > endPoint.getY()){
+                greaterY = startPoint.getY();
+                lesserY = endPoint.getY();
+            }
+            else{
+                lesserY = startPoint.getY();
+                greaterY = endPoint.getY();
+            }
+
+            Point result(this->getStartPoint().getX(), resultY);
+            if(resultY <= greaterY && resultY >= lesserY){
+                retval = x.pointOnLine(result);
+            }
+        }
+        else{
+            double greaterY;
+            double lesserY;
+            double resultY = (x.getStartPoint().getX() * this->slope) + this->intercept;
+            if(x.startPoint.getY() > x.endPoint.getY()){
+                greaterY = x.startPoint.getY();
+                lesserY = x.endPoint.getY();
+            }
+            else{
+                lesserY = x.startPoint.getY();
+                greaterY = x.endPoint.getY();
+            }
+
+            Point result(x.getStartPoint().getX(), resultY);
+            if(resultY <= greaterY && resultY >= lesserY){
+                retval = this->pointOnLine(result);
+            }
+        }
     }
     else{
         if(x.slope >= 0){
@@ -109,7 +149,7 @@ bool Line::lineIntersects(Line x){
         
         Point result(resultX, resultY);
         
-        retval = this->pointOnLine(result);
+        retval = this->pointOnLine(result) && x.pointOnLine(result);
     }
     return retval;
 }
@@ -121,9 +161,6 @@ string Line::toString(){
 
 double Line::findSlope(){
     double retval = deltaY/deltaX;
-    if(deltaX == 0){
-        retval = NULL;
-    }
     return retval;
 }
 
