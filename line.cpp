@@ -5,47 +5,55 @@
 
 using namespace std;
 
-Line::Line(Point x, Point y) : startPoint(0, 0), endPoint(0, 0){
-    setStartPoint(x);
-    setEndPoint(y);
+//Constructor that takes in two points and assigns them to start and end to make a line
+Line::Line(Point start, Point end) : startPoint(0, 0), endPoint(0, 0){
+    setStartPoint(start);
+    setEndPoint(end);
 }
 
+//Returns the start point of the line
 Point Line::getStartPoint(){
     return startPoint;
 }
 
+//Returns the end point of the line
 Point Line::getEndPoint(){
     return endPoint;
 }
 
-void Line::setStartPoint(Point x){
-    startPoint = x;
+//Sets the start point of the line and updates the slope and intercept of the line
+void Line::setStartPoint(Point start){
+    startPoint = start;
     deltaX = endPoint.getX() - startPoint.getX();
     deltaY = endPoint.getY() - startPoint.getY();
     slope = findSlope();
     intercept = findIntercept();
 }
 
-void Line::setEndPoint(Point x){
-    endPoint = x;
+//Sets the end point of the line and updates the slope and intercept of the line
+void Line::setEndPoint(Point end){
+    endPoint = end;
     deltaX = endPoint.getX() - startPoint.getX();
     deltaY = endPoint.getY() - startPoint.getY();
     slope = findSlope();
     intercept = findIntercept();
 }
 
+//Calculates the length of the line by using the pythagorean theorem. Returns the length as a double
 double Line::calculateLength(){
     double retval = sqrt(pow(deltaY, 2) + pow(deltaX, 2));
     return retval;
 }
 
-bool Line::pointOnLine(Point x){
-    double result = (slope * x.getX()) + intercept;
+//Checks to see if the passed in point is on the line. Returns true or false
+bool Line::pointOnLine(Point checkPoint){
+    double result = (slope * checkPoint.getX()) + intercept;
     bool retval = false;
     double greaterX;
     double lesserX;
     double greaterY;
     double lesserY;
+    //Finds the bounds of the line
     if(startPoint.getX() > endPoint.getX()){
         greaterX = startPoint.getX();
         lesserX = endPoint.getX();
@@ -62,40 +70,49 @@ bool Line::pointOnLine(Point x){
         lesserY = startPoint.getY();
         greaterY = endPoint.getY();
     }
-    if(x.getX() <= greaterX && x.getX() >= lesserX && x.getY() <= greaterY && x.getY() >= lesserY){
-        if(abs(x.getY() - result) < __DBL_EPSILON__){
+    //Checks to make sure that the passed in point is within the bounds of the line and checks to make sure the Y value of the point matches
+    //with the corresponding x value on the line. Uses epsilon to account for precision
+    if(checkPoint.getX() <= greaterX && checkPoint.getX() >= lesserX && checkPoint.getY() <= greaterY && checkPoint.getY() >= lesserY){
+        if(abs(checkPoint.getY() - result) < __DBL_EPSILON__){
             retval = true;
         }
     }
     return retval;
 }
 
-bool Line::lineIsParallel(Line x){
+//Checks to see if the line passed in is parallel to the implicit line. Returns true or false
+bool Line::lineIsParallel(Line checkLine){
     bool retval = false;
-    if(isinf(this->slope) && isinf(x.slope)){
+    //Checks to see if either line is vertical
+    if(isinf(this->slope) && isinf(checkLine.slope)){
         retval = true;
     }
-    else if(abs(this->slope - x.slope) <= __DBL_EPSILON__ && abs(this->intercept - x.intercept) > __DBL_EPSILON__){
+    //Checks to see if the slopes of the two lines are the same. Uses epsilon to account for precision
+    else if(abs(this->slope - checkLine.slope) <= __DBL_EPSILON__ && abs(this->intercept - checkLine.intercept) > __DBL_EPSILON__){
         retval = true;
     }
     return retval;
 }
 
-bool Line::lineIntersects(Line x){
+//Checks to see if the line passed in intersects the implicit line. Returns true or false
+bool Line::lineIntersects(Line checkLine){
     bool retval = false;
     double newSlope;
     double newIntercept;
     double resultX;
     double resultY;
     
-    if(lineIsParallel(x)){
+    //Checks to see if the two lines are parallel. Returns false if so
+    if(lineIsParallel(checkLine)){
         retval = false;
     }
-    else if(isinf(this->slope) || isinf(x.slope)){
+    //Checks to see if one or both of the lines are vertical
+    else if(isinf(this->slope) || isinf(checkLine.slope)){
+        //If the implicit line is vertical, finds the intercept and checks if the line intersects the passed in line
         if(isinf(this->slope)){
             double greaterY;
             double lesserY;
-            double resultY = (this->getStartPoint().getX() * x.slope) + x.intercept;
+            double resultY = (this->getStartPoint().getX() * checkLine.slope) + checkLine.intercept;
             if(startPoint.getY() > endPoint.getY()){
                 greaterY = startPoint.getY();
                 lesserY = endPoint.getY();
@@ -107,41 +124,43 @@ bool Line::lineIntersects(Line x){
 
             Point result(this->getStartPoint().getX(), resultY);
             if(resultY <= greaterY && resultY >= lesserY){
-                retval = x.pointOnLine(result);
+                retval = checkLine.pointOnLine(result);
             }
         }
+        //If the passed in line is vertical, finds the intercept and checks if the line intersects the implicit line
         else{
             double greaterY;
             double lesserY;
-            double resultY = (x.getStartPoint().getX() * this->slope) + this->intercept;
-            if(x.startPoint.getY() > x.endPoint.getY()){
-                greaterY = x.startPoint.getY();
-                lesserY = x.endPoint.getY();
+            double resultY = (checkLine.getStartPoint().getX() * this->slope) + this->intercept;
+            if(checkLine.startPoint.getY() > checkLine.endPoint.getY()){
+                greaterY = checkLine.startPoint.getY();
+                lesserY = checkLine.endPoint.getY();
             }
             else{
-                lesserY = x.startPoint.getY();
-                greaterY = x.endPoint.getY();
+                lesserY = checkLine.startPoint.getY();
+                greaterY = checkLine.endPoint.getY();
             }
 
-            Point result(x.getStartPoint().getX(), resultY);
+            Point result(checkLine.getStartPoint().getX(), resultY);
             if(resultY <= greaterY && resultY >= lesserY){
                 retval = this->pointOnLine(result);
             }
         }
     }
+    //If no vertical lines are present, checks to see if the two lines interesect
     else{
-        if(x.slope >= 0){
-            newSlope = this->slope - x.slope;
+        if(checkLine.slope >= 0){
+            newSlope = this->slope - checkLine.slope;
         }
         else{
-            newSlope = this->slope + x.slope;
+            newSlope = this->slope + checkLine.slope;
         }
         
         if(this->intercept >= 0){
-            newIntercept = x.intercept - this->intercept;
+            newIntercept = checkLine.intercept - this->intercept;
         }
         else{
-            newIntercept = x.intercept + this->intercept;
+            newIntercept = checkLine.intercept + this->intercept;
         }
         
         resultX = newIntercept / newSlope;
@@ -149,21 +168,24 @@ bool Line::lineIntersects(Line x){
         
         Point result(resultX, resultY);
         
-        retval = this->pointOnLine(result) && x.pointOnLine(result);
+        retval = this->pointOnLine(result) && checkLine.pointOnLine(result);
     }
     return retval;
 }
 
+//Returns a string representation of the line
 string Line::toString(){
     string retval = "Point 1: [" + startPoint.toString() + "], Point 2: [" + endPoint.toString() + "]";
     return retval;
 }
 
+//Finds the slope of the line. Returns the slope as a double
 double Line::findSlope(){
     double retval = deltaY/deltaX;
     return retval;
 }
 
+//Finds the intercept of the line. Returns the intercept as a double
 double Line::findIntercept(){
     return startPoint.getY() - (startPoint.getX() * slope);
 }

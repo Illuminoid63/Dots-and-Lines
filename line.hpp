@@ -16,14 +16,14 @@ class Line{
     double findSlope();
     double findIntercept();
     public:
-    Line(Point x, Point y);
+    Line(Point start, Point end);
     Point getStartPoint();
     Point getEndPoint();
-    void setStartPoint(Point x);
-    void setEndPoint(Point x);
+    void setStartPoint(Point start);
+    void setEndPoint(Point end);
     double calculateLength();
-    bool pointOnLine(Point x);
-    bool lineIsParallel(Line x);
-    bool lineIntersects(Line x);
+    bool pointOnLine(Point checkPoint);
+    bool lineIsParallel(Line checkLine);
+    bool lineIntersects(Line checkLine);
     string toString();
 };
